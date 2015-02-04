@@ -1,0 +1,14 @@
+doctype html
+html(ng-app="myApp")
+  head
+    meta(charset='utf8')
+    base(href='/')
+    title Frontend
+    link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css')
+    // link(rel='stylesheet', href='/css/superhero.css')
+    link(rel='stylesheet', href='/css/app.css')
+  body
+    .header
+      include header
+    .body
+      block body

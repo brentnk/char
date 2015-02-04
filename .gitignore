@@ -1,0 +1,5 @@
+node_modules/
+irc.config.js
+appconfig.js
+*.test.*
+public/bower_components/**
