@@ -20,7 +20,7 @@ function appController($scope, sSocket) {
 
     sSocket.on('irc:message', function(msg){
         d3.selectAll('.ircmessage').style('color', function(){
-            return 'hsl(' + Math.random() * 360 + ',100%,50%)';
+            return 'hsl(' + Math.random() * 55 + 160 + ',100%,40%)';
         });
         $scope.messages.push(msg);
         $scope.channels[msg.channel].msgcount += 1;
