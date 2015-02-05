@@ -1,39 +1,44 @@
 /* app css stylesheet */
-body {
+body,.body {
     margin: 0;
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vw;
 }
 
-.flex-container {
+.flex-site-col {
     display: flex;
+    width: 100%;
+    height: 100%;
+    flex-flow: column nowrap;
+}
+
+.flex-main-row {
+    flex:1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    will-change: overflow;
 }
 
 .sidebar {
-    width: 300;
-    height: 100%;
-    margin: auto;
+    width: 190px;
+    padding: 4px;
+    background-color: #333a4a;
 }
 
 .main-content {
-    margin: auto;
-}
-
-.commandbar {
-    height: 50px;
-    padding: 0px;
-}
-
-.vsplit {
-    min-height:100%;
-    height: 100%;
-    padding: 0px 7px;
+    flex: 1;
+    padding: 4px;
+    background-color: #599bb5;
+    overflow: auto;
 }
 
 .command-line {
-    position:  fixed;
-    bottom: 0;
-    left: 0;
+    height: 34px;
+    width: 100%;
 }
 
 .ircmessage {
@@ -41,10 +46,7 @@ body {
 }
 
 .iograph {
-    position: fixed;
-    bottom: 35px;
-    left: 0px;
     height: 55px;
     width: 100%;
-    border: 1px dotted #ddd;
+    border: 1px solid #ddd;
 }

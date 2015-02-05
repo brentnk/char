@@ -26,7 +26,7 @@ function appController($scope, sSocket) {
             $scope.channels[temp.channelname].msgcount -= 1;
         }
         d3.selectAll('.ircmessage').style('color', function(){
-            return 'hsl(' + (Math.random() * 25 + 160) + ',100%,40%)';
+            return 'hsl(' + (Math.random() * 25 + 160) + ',100%,80%)';
         });
     });
 

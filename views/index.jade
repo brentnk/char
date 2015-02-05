@@ -1,18 +1,19 @@
 extends layout
 
 block body
-  .flex-container(ng-controller='appController')
-    .sidebar
-      .list-group
-        a.list-group-item(ng-repeat='(key, value) in channels', href='#')
-          {{key}}
-          span.badge {{value.msgcount}}
+  .flex-site-col(ng-controller='appController')
+    .flex-main-row
+      .sidebar
+        .list-group
+          a.list-group-item(ng-repeat='(key, value) in channels', href='#')
+            {{key}}
+            span.badge {{value.msgcount}}
 
-    .main-content
-      .ircmessages.col-sm-10.list-group
-        .list-group-item.ircmessage(ng-repeat="a in messages | filter: chatfilter")
-          span.glyphicon.glyphicon-chevron-right
-          {{a.from}} - {{a.body}}
+      .main-content
+        .ircmessages
+          .ircmessage(ng-repeat="a in messages | filter: chatfilter")
+            span.glyphicon.glyphicon-chevron-right
+            {{a.from}} - {{a.body}}
 
     .iograph
 
