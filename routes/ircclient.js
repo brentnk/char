@@ -72,6 +72,9 @@ module.exports = function(io) {
                 case 'clear':
                     socket.emit('irc:clearchat');
                     break;
+                case 'set':
+                    if (cmd[1] == '-')
+                    break;
                 default:
                     console.log('Command not recognized');
             }
