@@ -40,3 +40,12 @@ body {
 .ircmessage {
     padding: 4px 15px;
 }
+
+.iograph {
+    position: fixed;
+    bottom: 35px;
+    left: 0px;
+    height: 55px;
+    width: 100%;
+    border: 1px dotted #ddd;
+}

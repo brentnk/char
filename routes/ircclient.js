@@ -15,11 +15,12 @@ var defcb = function(err, user, numberAffected) {
 };
 
 var parseRaw = function(str) {
+    str = str.trim();
+    if (str.length < 1) return ''; // The cake is a lie
     return str.split(' ');
 }
 
 module.exports = function(io) {
-    //console.log(ircconfig);
     server = ircconfig.server;
     var irc = new _irc.Client(ircconfig.server, ircconfig.nick, ircconfig.options);
 
@@ -55,30 +56,25 @@ module.exports = function(io) {
                     if (cmd[1]) {
                     console.log('Joining ', cmd.slice(1,cmd.length).join(' '));
                     irc.join(cmd.slice(1,cmd.length).join(' '));
-                }
-                break;
+                    }
+                    break;
                 case 'part' :
                     if (cmd[1]) {
                     console.log('Parting ', cmd[1]);
-                    console.log(irc.chanData(cmd[1]));
                     if(irc.chanData(cmd[1])) {
                         irc.part(cmd[1]);
                     } else {
                         console.log('Not connected to ', cmd[1]);
                     }
                     socket.emit('irc:chandc', {channelname: cmd[1]});
-                }
-                break;
+                    }
+                    break;
+                case 'clear':
+                    socket.emit('irc:clearchat');
+                    break;
                 default:
                     console.log('Command not recognized');
             }
-        });
-
-        socket.on('RequestChannelPart', function(data) {
-            client.channelPart(data.channelname);
-        });
-        socket.on('RequestJoinChannel', function(data){
-            client.channelJoin(data.channelname.join(' '));
         });
     });
 
@@ -91,13 +87,6 @@ module.exports = function(io) {
     //})
 
     irc.addListener('message', function (sFrom, sTo, text, raw) {
-        //console.log('A message was received: ', message);
-        //console.log(Object.keys(irc.chans));
-        //if(channels.indexOf(sTo) == -1) {
-        //channels.push(sTo);
-        //io.sockets.emit('irc:newchannel', { channelname:sTo });
-        //}
-        //console.log(raw);
         Channel.addMessage(server,sTo, sFrom, text, defcb);
         io.sockets.emit('irc:message',  { from: sFrom, channel: sTo, body: text });
     });

@@ -19,15 +19,15 @@ function appController($scope, sSocket) {
     });
 
     sSocket.on('irc:message', function(msg){
-        d3.selectAll('.ircmessage').style('color', function(){
-            return 'hsl(' + Math.random() * 55 + 160 + ',100%,40%)';
-        });
         $scope.messages.push(msg);
         $scope.channels[msg.channel].msgcount += 1;
         while ($scope.messages.length > messageLimitGlobal) {
             temp = $scope.messages.shift();
             $scope.channels[temp.channelname].msgcount -= 1;
         }
+        d3.selectAll('.ircmessage').style('color', function(){
+            return 'hsl(' + (Math.random() * 25 + 160) + ',100%,40%)';
+        });
     });
 
     sSocket.on('irc:newchannel', function(data) {

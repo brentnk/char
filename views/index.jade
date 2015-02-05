@@ -4,7 +4,7 @@ block body
   .container-fluid(ng-controller='appController')
     .vsplit
       .list-group.col-sm-2
-        a.list-group-item(ng-repeat='(key, value) in channels', href='#') 
+        a.list-group-item(ng-repeat='(key, value) in channels', href='#')
           {{key}}
           span.badge {{value.msgcount}}
 
