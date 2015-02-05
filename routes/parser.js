@@ -58,6 +58,12 @@ fsm = function(str) {
             }
         },
         qs: function(str) {
+            if (isQuote(ch)) {
+                parsed.push(str.slice(tail, head));
+                head += 1;
+                tail = head;
+                tra
+            }
             if (isToken(ch)) {
                 head += 1;
                 this.transition('qs', 'qs');
