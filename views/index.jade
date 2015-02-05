@@ -1,13 +1,14 @@
 extends layout
 
 block body
-  .container-fluid(ng-controller='appController')
-    .vsplit
-      .list-group.col-sm-2
+  .flex-container(ng-controller='appController')
+    .sidebar
+      .list-group
         a.list-group-item(ng-repeat='(key, value) in channels', href='#')
           {{key}}
           span.badge {{value.msgcount}}
 
+    .main-content
       .ircmessages.col-sm-10.list-group
         .list-group-item.ircmessage(ng-repeat="a in messages | filter: chatfilter")
           span.glyphicon.glyphicon-chevron-right
