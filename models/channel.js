@@ -12,6 +12,10 @@ var chanSchema = m.Schema({
 
 chanSchema.index({server:1, channelname: 1}, {unique: true});
 
+chanSchema.statics.getAllChannels = function() {
+    this.find()
+}
+
 chanSchema.statics.addMessage = function(server, channel, user, message, callback) {
     this.findOne({server:server, channelname: channel}, function(err,doc) {
         if (err) {
