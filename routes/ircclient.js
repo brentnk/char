@@ -1,10 +1,11 @@
 var _irc      = require('irc');
-var config    = require('../appconfig');
+var config    = require('../appconfig.js');
 var ircconfig = config.irc;
 var mongoose  = require('mongoose');
 var Channel   = require('../models/channel');
 var appConfig = require('../models/options');
 var parser    = require('./parser');
+var options   = require('../models/options');
 
 var defcb = function(err, user, numberAffected) {
     if (err) {
@@ -22,8 +23,12 @@ module.exports = function(io) {
     var getChannels = function() {
         return Object.keys(irc.chans)
     };
+    var getAutoJoins = function(callback) {
+        options.find({key:'autojoin'}).select('value').exec(callback);
+    }
 
     mongoose.connect(config.db.connectionString);
+
 
     //
     // Socket IO routes
@@ -40,7 +45,8 @@ module.exports = function(io) {
                 console.log('Blank command received');
                 return;
             }
-            var cmd = parser(data.raw);
+            var cmd = parser(data.raw).data[0];
+            console.log(cmd);
             //var cmd = parseRaw(data.raw);
             if(!cmd || cmd.length < 1) {
                 console.log('Invalid command');
@@ -69,8 +75,18 @@ module.exports = function(io) {
                     socket.emit('irc:clearchat');
                     break;
                 case 'autojoin':
-                    if (cmd[1] == '-') {
-
+                    if (cmd[1] && cmd[1] == '-') {
+                        if(cmd[2]) {
+                            options.rm('autojoin', cmd[2]);
+                        }
+                    } else if (cmd[1] && cmd[1] == '+') {
+                        if(cmd[2]) {
+                            options.add('autojoin', cmd[2]);
+                        }
+                    } else if (cmd[1] && cmd[1] == '^') {
+                        if(cmd[2]) {
+                            options.add(cmd[2]);
+                        }
                     }
                     break;
                 default:
@@ -86,6 +102,18 @@ module.exports = function(io) {
     //irc.addListener('raw', function(msg) {
     //console.log(msg);
     //})
+
+    irc.addListener('registered', function() {
+        getAutoJoins(function(err,res) {
+            if(err) {return;}
+            //console.log(res,res.length);
+            for(var a in res) {
+                console.log(res[a].value);
+                irc.join(res[a].value);
+            }
+    });
+
+    })
 
     irc.addListener('message', function (sFrom, sTo, text, raw) {
         Channel.addMessage(server,sTo, sFrom, text, defcb);
