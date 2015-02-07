@@ -5,10 +5,14 @@
 function appController($scope, sSocket) {
 
     $scope.channels = new Object();
-    $scope.messages = [];
+    messages = [];
+    $scope.messages = function(limit) {
+        return messages.slice(-50);
+    }
 
     var messageLimitPerChannel = 50;
-    var messageLimitGlobal = 10000;
+    var messageLimitGlobal = 1500;
+    var messsgeLimitView = 75;
 
     //
     // sSocket listeners
@@ -22,8 +26,8 @@ function appController($scope, sSocket) {
         $scope.messages.push(msg);
         $scope.channels[msg.channel].msgcount += 1;
         while ($scope.messages.length > messageLimitGlobal) {
-            temp = $scope.messages.shift();
-            $scope.channels[temp.channelname].msgcount -= 1;
+            var temp = $scope.messages.shift();
+            $scope.channels[temp.channel].msgcount -= 1;
         }
         d3.selectAll('.ircmessage').style('color', function(){
             return 'hsl(' + (Math.random() * 25 + 160) + ',100%,80%)';
