@@ -1,9 +1,10 @@
-var _irc = require('irc');
-var config = require('../appconfig');
+var _irc      = require('irc');
+var config    = require('../appconfig');
 var ircconfig = config.irc;
-var mongoose = require('mongoose');
-var Channel = require('../models/channel');
-
+var mongoose  = require('mongoose');
+var Channel   = require('../models/channel');
+var appConfig = require('../models/options');
+var parser    = require('./parser');
 
 var defcb = function(err, user, numberAffected) {
     if (err) {
@@ -13,12 +14,6 @@ var defcb = function(err, user, numberAffected) {
 
     //console.log('Message was added..');
 };
-
-var parseRaw = function(str) {
-    str = str.trim();
-    if (str.length < 1) return ''; // The cake is a lie
-    return str.split(' ');
-}
 
 module.exports = function(io) {
     server = ircconfig.server;
@@ -45,7 +40,8 @@ module.exports = function(io) {
                 console.log('Blank command received');
                 return;
             }
-            var cmd = parseRaw(data.raw);
+            var cmd = parser(data.raw);
+            //var cmd = parseRaw(data.raw);
             if(!cmd || cmd.length < 1) {
                 console.log('Invalid command');
                 return;
@@ -72,8 +68,10 @@ module.exports = function(io) {
                 case 'clear':
                     socket.emit('irc:clearchat');
                     break;
-                case 'set':
-                    if (cmd[1] == '-')
+                case 'autojoin':
+                    if (cmd[1] == '-') {
+
+                    }
                     break;
                 default:
                     console.log('Command not recognized');
