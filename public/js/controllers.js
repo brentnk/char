@@ -5,14 +5,11 @@
 function appController($scope, sSocket) {
 
     $scope.channels = new Object();
-    messages = [];
-    $scope.messages = function(limit) {
-        return messages.slice(-50);
-    }
+    $scope.messages = [];
 
     var messageLimitPerChannel = 50;
     var messageLimitGlobal = 1500;
-    var messsgeLimitView = 75;
+    $scope.messsgeLimitView = 75;
 
     //
     // sSocket listeners

@@ -12,6 +12,7 @@ block body
       .main-content
         .ircmessages
           .ircmessage(ng-repeat="a in messages | filter: chatfilter")
+            {{$index}}
             span.glyphicon.glyphicon-chevron-right
             {{a.from}} - {{a.body}}
 

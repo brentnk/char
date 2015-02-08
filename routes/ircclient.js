@@ -58,8 +58,8 @@ module.exports = function(io) {
                     if (cmd[1]) {
                     console.log('Joining ', cmd.slice(1,cmd.length).join(' '));
                     irc.join(cmd.slice(1,cmd.length).join(' '));
-                    }
-                    break;
+                }
+                break;
                 case 'part' :
                     if (cmd[1]) {
                     console.log('Parting ', cmd[1]);
@@ -69,26 +69,26 @@ module.exports = function(io) {
                         console.log('Not connected to ', cmd[1]);
                     }
                     socket.emit('irc:chandc', {channelname: cmd[1]});
-                    }
-                    break;
+                }
+                break;
                 case 'clear':
                     socket.emit('irc:clearchat');
-                    break;
+                break;
                 case 'autojoin':
                     if (cmd[1] && cmd[1] == '-') {
-                        if(cmd[2]) {
-                            options.rm('autojoin', cmd[2]);
-                        }
-                    } else if (cmd[1] && cmd[1] == '+') {
-                        if(cmd[2]) {
-                            options.add('autojoin', cmd[2]);
-                        }
-                    } else if (cmd[1] && cmd[1] == '^') {
-                        if(cmd[2]) {
-                            options.add(cmd[2]);
-                        }
+                    if(cmd[2]) {
+                        options.rm('autojoin', cmd[2]);
                     }
-                    break;
+                } else if (cmd[1] && cmd[1] == '+') {
+                    if(cmd[2]) {
+                        options.add('autojoin', cmd[2]);
+                    }
+                } else if (cmd[1] && cmd[1] == '^') {
+                    if(cmd[2]) {
+                        options.add(cmd[2]);
+                    }
+                }
+                break;
                 default:
                     console.log('Command not recognized');
             }
@@ -111,7 +111,7 @@ module.exports = function(io) {
                 console.log(res[a].value);
                 irc.join(res[a].value);
             }
-    });
+        });
 
     })
 

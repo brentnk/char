@@ -7,7 +7,7 @@ var appConfigSchema = new m.Schema({
 
 appConfigSchema.statics.rm = function(key, val) {
     console.log('Removing: ',key,val);
-    Config.remove({key:this.key, value:val}, function(err) {
+    Config.remove({key:key, value:val}, function(err) {
         if(err) { console.log(err); }
     });
 }
