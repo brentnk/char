@@ -6,6 +6,7 @@ var Channel   = require('../models/channel');
 var appConfig = require('../models/options');
 var parser    = require('./parser');
 var options   = require('../models/options');
+var commander = require('../commandmusings');
 
 var defcb = function(err, user, numberAffected) {
     if (err) {
@@ -27,6 +28,8 @@ module.exports = function(io) {
         options.find({key:'autojoin'}).select('value').exec(callback);
     }
 
+    var cmds = new commander();
+
     mongoose.connect(config.db.connectionString);
 
 
@@ -47,11 +50,12 @@ module.exports = function(io) {
             }
             var cmd = parser(data.raw).data[0];
             console.log(cmd);
-            //var cmd = parseRaw(data.raw);
             if(!cmd || cmd.length < 1) {
                 console.log('Invalid command');
                 return;
             }
+
+            commander.handle(cmd);
 
             switch(cmd[0]) {
                 case 'join':
@@ -125,7 +129,6 @@ module.exports = function(io) {
     });
 
     irc.addListener('part', function(channel, nick, reason, message) {
-        //console.log(channel, nick);
         if(ircconfig.name == nick) {
             console.log('I left ',channel);
             io.sockets.emit('irc:part', {channelname:channel});
@@ -133,10 +136,44 @@ module.exports = function(io) {
     });
 
     irc.addListener('join', function(channel, nick,message){
-        //console.log(channel,nick);
         if(ircconfig.nick == nick){
             console.log('I joined ',channel);
             io.sockets.emit('irc:newchannel', {channelname:channel});
         }
     });
+}
+
+var commands = {
+    join: {
+        validate: function(args) {
+            for(var arg in args) {
+                if(!arg.startsWith('#')) {
+                    console.warn('Channel `', arg,'` must begin with #');
+                }
+            }
+            return true;
+        },
+        exec: function(args) {
+            irc.join(args.join(' '));
+        }
+    }
+    part: {
+        validate: function(args){
+            if(!arg[0].startsWith('#')) {
+                console.warn('Channel `', arg,'` must begin with #');
+            }
+            return true;
+        },
+        exec: function(args) {
+            irc.part(args.shift());
+        },
+        repeat: true
+    }
+    clear: {
+        exec: function() {
+            console.log('Clear all chat lines in browser');
+        }
+    }
+    autojoin:
+        set
 }
