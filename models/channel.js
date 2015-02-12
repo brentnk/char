@@ -1,4 +1,6 @@
 var m = require('mongoose');
+var events = require('events');
+var emitter = new events.EventEmitter();
 
 var chanSchema = m.Schema({
     server: {type: String, required: true },
@@ -13,13 +15,14 @@ var chanSchema = m.Schema({
 chanSchema.index({server:1, channelname: 1}, {unique: true});
 
 chanSchema.statics.getAllChannels = function() {
-    this.find()
+    this.find();
 }
 
-chanSchema.statics.addMessage = function(server, channel, user, message, callback) {
+chanSchema.statics.addMessage = function(server, channel, user, message) {
     this.findOne({server:server, channelname: channel}, function(err,doc) {
         if (err) {
-            return callback(err, null)
+            console.error('There was an error saving');
+            emitter.emit('addMessage::SaveError');
         };
 
         if(!doc) {
@@ -34,17 +37,39 @@ chanSchema.statics.addMessage = function(server, channel, user, message, callbac
                 from: user
             });
 
-            newdoc.save(callback)
-        }
+            console.log('Saving doc in new channel');
+            newdoc.save( function (err, unit, numAffected)  {
+                if(err) {
+                    emitter.emit('addMessage::SaveError')
+                    return;
+                }
 
-        if(doc) {
+                if (numAffected < 1) {
+                    emitter.emit('addMessage::SaveError::NoRowsAffected');
+                } else {
+                    emitter.emit('addMessage::DocumentSaved');
+                }
+            });
+        } else {
             doc.messages.push({
                 message: message,
                 ts: Date.now(),
                 from: user
             });
 
-            doc.save(callback);
+            //console.log('Saving message to mongo.');
+            doc.save(function (err, unit, numAffected)  {
+                if(err) {
+                    emitter.emit('addMessage::SaveError')
+                    return;
+                }
+
+                if (numAffected < 1) {
+                    emitter.emit('addMessage::SaveError::NoRowsAffected');
+                } else {
+                    emitter.emit('addMessage::DocumentSaved');
+                }
+            });
         };
     });
 };

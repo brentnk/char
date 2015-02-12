@@ -6,7 +6,9 @@ var Channel   = require('../models/channel');
 var appConfig = require('../models/options');
 var parser    = require('./parser');
 var options   = require('../models/options');
-var commander = require('../commandmusings');
+var https     = require('https');
+
+var heapdump = require('heapdump');
 
 var defcb = function(err, user, numberAffected) {
     if (err) {
@@ -14,7 +16,8 @@ var defcb = function(err, user, numberAffected) {
         return;
     };
 
-    //console.log('Message was added..');
+    console.log('Message was added... rows affected ', numberAffected);
+    return;
 };
 
 module.exports = function(io) {
@@ -28,11 +31,15 @@ module.exports = function(io) {
         options.find({key:'autojoin'}).select('value').exec(callback);
     }
 
-    var cmds = new commander();
-
     mongoose.connect(config.db.connectionString);
 
 
+    if (config.heapdump) {
+
+        setInterval(function() {
+            heapdump.writeSnapshot();
+        }, 3000);
+    }
     //
     // Socket IO routes
     //
@@ -55,9 +62,32 @@ module.exports = function(io) {
                 return;
             }
 
-            commander.handle(cmd);
-
             switch(cmd[0]) {
+                case 'top5':
+                    https.request({
+                    hostname: config.twitchApi.base,
+                    headers: config.twitchApi.header,
+                    path: '/kraken/streams',
+                    method: 'GET'
+                }, function(res) {
+                    res.setEncoding('utf8');
+                    var str = '';
+                    res.on('data', function(chunk) {
+                        str += chunk;
+                    });
+                    res.on('end', function(){
+                        console.log('END of read');
+                        var streams = JSON.parse(str);
+                        if('steams' in streams && stream['streams'].length > 0){
+                            for(var strim in streams['streams'].slice(0,5)) {
+                                if ('name' in strim) {
+                                    irc.join(strim.name);
+                                }
+                            }
+                        }
+                    })
+                }).end();
+                break;
                 case 'join':
                     if (cmd[1]) {
                     console.log('Joining ', cmd.slice(1,cmd.length).join(' '));
@@ -120,7 +150,7 @@ module.exports = function(io) {
     })
 
     irc.addListener('message', function (sFrom, sTo, text, raw) {
-        Channel.addMessage(server,sTo, sFrom, text, defcb);
+        Channel.addMessage(server,sTo, sFrom, text);
         io.sockets.emit('irc:message',  { from: sFrom, channel: sTo, body: text });
     });
 
@@ -141,39 +171,4 @@ module.exports = function(io) {
             io.sockets.emit('irc:newchannel', {channelname:channel});
         }
     });
-}
-
-var commands = {
-    join: {
-        validate: function(args) {
-            for(var arg in args) {
-                if(!arg.startsWith('#')) {
-                    console.warn('Channel `', arg,'` must begin with #');
-                }
-            }
-            return true;
-        },
-        exec: function(args) {
-            irc.join(args.join(' '));
-        }
-    }
-    part: {
-        validate: function(args){
-            if(!arg[0].startsWith('#')) {
-                console.warn('Channel `', arg,'` must begin with #');
-            }
-            return true;
-        },
-        exec: function(args) {
-            irc.part(args.shift());
-        },
-        repeat: true
-    }
-    clear: {
-        exec: function() {
-            console.log('Clear all chat lines in browser');
-        }
-    }
-    autojoin:
-        set
 }

@@ -27,7 +27,7 @@ function appController($scope, sSocket) {
             $scope.channels[temp.channel].msgcount -= 1;
         }
         d3.selectAll('.ircmessage').style('color', function(){
-            return 'hsl(' + (Math.random() * 25 + 160) + ',100%,80%)';
+            return 'hsl(' + (Math.random() * 75 + 160) + ',100%,80%)';
         });
     });
 
@@ -54,6 +54,7 @@ function appController($scope, sSocket) {
         console.log('processCmd from browser: ', $scope.cmdl);
         console.log(sSocket);
         sSocket.emit('cmdline', {raw: $scope.cmdl});
+        $scope.cmdl = '';
     }
 
     $scope.chatFilter = function(filter) {
