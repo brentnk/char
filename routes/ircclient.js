@@ -63,14 +63,20 @@ module.exports = function(io) {
             }
 
             switch(cmd[0]) {
-                case 'top5':
+                case 'top':
+                    console.log(typeof(cmd[1]));
+                    if(cmd[1] && !isNaN(parseInt(cmd[1],10)) && cmd[1] > 0) {
+                        limit = Number(cmd[1]);
+                    } else {
+                        limit = 5;
+                    }
+                    console.log('limit:',limit);
                     var options = {
                         hostname: config.twitchApi.base,
                         headers: config.twitchApi.header,
                         path: '/kraken/streams',
                         method: 'GET'
                     };
-                    console.log(options);
                     var req = https.request(options , function(res) {
                         res.setEncoding('utf8');
                         var str = '';
@@ -80,13 +86,10 @@ module.exports = function(io) {
                         });
 
                         res.on('end', function(){
-                            console.log('END of read');
                             var streams = JSON.parse(str);
-                            console.log(streams);
                             if('streams' in streams && streams['streams'].length > 0){
-                                var top = streams['streams'].slice(0,5);
+                                var top = streams['streams'].slice(0,limit);
                                 for(var i = 0; i < top.length; i++) {
-                                    console.log(top[i]);
                                     if ('channel' in top[i]) {
                                         irc.join('#' + top[i].channel.display_name);
                                     }
