@@ -64,29 +64,40 @@ module.exports = function(io) {
 
             switch(cmd[0]) {
                 case 'top5':
-                    https.request({
-                    hostname: config.twitchApi.base,
-                    headers: config.twitchApi.header,
-                    path: '/kraken/streams',
-                    method: 'GET'
-                }, function(res) {
-                    res.setEncoding('utf8');
-                    var str = '';
-                    res.on('data', function(chunk) {
-                        str += chunk;
-                    });
-                    res.on('end', function(){
-                        console.log('END of read');
-                        var streams = JSON.parse(str);
-                        if('steams' in streams && stream['streams'].length > 0){
-                            for(var strim in streams['streams'].slice(0,5)) {
-                                if ('name' in strim) {
-                                    irc.join(strim.name);
+                    var options = {
+                        hostname: config.twitchApi.base,
+                        headers: config.twitchApi.header,
+                        path: '/kraken/streams',
+                        method: 'GET'
+                    };
+                    console.log(options);
+                    var req = https.request(options , function(res) {
+                        res.setEncoding('utf8');
+                        var str = '';
+
+                        res.on('data', function(chunk) {
+                            str += chunk;
+                        });
+
+                        res.on('end', function(){
+                            console.log('END of read');
+                            var streams = JSON.parse(str);
+                            console.log(streams);
+                            if('streams' in streams && streams['streams'].length > 0){
+                                var top = streams['streams'].slice(0,5);
+                                for(var i = 0; i < top.length; i++) {
+                                    console.log(top[i]);
+                                    if ('channel' in top[i]) {
+                                        irc.join('#' + top[i].channel.display_name);
+                                    }
                                 }
                             }
-                        }
+                        });
                     })
-                }).end();
+                    req.end();
+                    req.on('error', function(err) {
+                        console.error(err);
+                    })
                 break;
                 case 'join':
                     if (cmd[1]) {
