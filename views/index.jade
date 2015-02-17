@@ -5,14 +5,14 @@ block body
     .flex-main-row
       .sidebar
         .list-group
-          a.list-group-item(ng-repeat='(key, value) in channels', href='#')
+          a.list-group-item(ng-repeat='(key, value) in channels', ng-click='chatFilter(key)')
             {{key}}
             span.badge {{value.msgcount}}
 
       .main-content
         .ircmessages
           .ircmessage(ng-repeat="a in messages | filter: chatfilter")
-            {{$index}}
+            span.channel-name {{a.channel}}
             span.glyphicon.glyphicon-chevron-right
             {{a.from}} - {{a.body}}
 

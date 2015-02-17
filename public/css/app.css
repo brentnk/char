@@ -50,3 +50,8 @@ body,.body {
     width: 100%;
     border: 1px solid #ddd;
 }
+
+.channel-name {
+    display: inline-block;
+    width: 150px;
+}

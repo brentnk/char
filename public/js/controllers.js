@@ -8,7 +8,7 @@ function appController($scope, sSocket) {
     $scope.messages = [];
 
     var messageLimitPerChannel = 50;
-    var messageLimitGlobal = 1500;
+    var messageLimitGlobal = 400;
     $scope.messsgeLimitView = 75;
 
     //
@@ -26,9 +26,9 @@ function appController($scope, sSocket) {
             var temp = $scope.messages.shift();
             $scope.channels[temp.channel].msgcount -= 1;
         }
-        d3.selectAll('.ircmessage').style('color', function(){
-            return 'hsl(' + (Math.random() * 75 + 160) + ',100%,80%)';
-        });
+        //d3.selectAll('.ircmessage').style('color', function(){
+            //return 'hsl(' + (Math.random() * 75 + 160) + ',100%,80%)';
+        //});
     });
 
     sSocket.on('irc:newchannel', function(data) {
@@ -40,8 +40,8 @@ function appController($scope, sSocket) {
         console.log(Object.keys($scope.channels));
     });
 
-    sSocket.on('irc:chandc', function(data) {
-        console.log('irc:chandc -> ', data.channelname);
+    sSocket.on('irc:part', function(data) {
+        console.log('irc:part -> ', data.channelname);
         delete $scope.channels[data.channelname];
     });
 

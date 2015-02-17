@@ -8,7 +8,7 @@ var parser    = require('./parser');
 var options   = require('../models/options');
 var https     = require('https');
 
-var heapdump = require('heapdump');
+//var heapdump = require('heapdump');
 
 var defcb = function(err, user, numberAffected) {
     if (err) {
@@ -40,6 +40,7 @@ module.exports = function(io) {
             heapdump.writeSnapshot();
         }, 3000);
     }
+
     //
     // Socket IO routes
     //
@@ -110,14 +111,25 @@ module.exports = function(io) {
                 break;
                 case 'part' :
                     if (cmd[1]) {
-                    console.log('Parting ', cmd[1]);
-                    if(irc.chanData(cmd[1])) {
-                        irc.part(cmd[1]);
+                        console.log('Parting ', cmd[1]);
+                        if(irc.chanData(cmd[1])) {
+                            irc.part(cmd[1]);
+                        } else {
+                            console.log('Not connected to ', cmd[1]);
+                        }
+                        //socket.emit('irc:chandc', {channelname: cmd[1]});
                     } else {
-                        console.log('Not connected to ', cmd[1]);
+                        console.log('Parting all channels');
+                        var chans = getChannels();
+                        console.log(chans);
+                        for(var chan in chans) {
+                            if(irc.chanData(chans[chan])) {
+                                irc.part(chans[chan]);
+                            } else {
+                                console.log('Not connected to ', chans[chan]);
+                            }
+                        }
                     }
-                    socket.emit('irc:chandc', {channelname: cmd[1]});
-                }
                 break;
                 case 'clear':
                     socket.emit('irc:clearchat');
@@ -173,7 +185,8 @@ module.exports = function(io) {
     });
 
     irc.addListener('part', function(channel, nick, reason, message) {
-        if(ircconfig.name == nick) {
+        //console.log('part',channel,nick,reason,message);
+        if(ircconfig.nick == nick) {
             console.log('I left ',channel);
             io.sockets.emit('irc:part', {channelname:channel});
         }
