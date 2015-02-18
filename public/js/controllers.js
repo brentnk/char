@@ -60,6 +60,12 @@ function appController($scope, sSocket) {
         $scope.cmdl = '';
     }
 
+    $scope.toggleChannelMessages = function(e,key) {
+        if(key in tags) {
+
+        }
+    }
+
     $scope.chatFilter = function(filter) {
         $scope.chatfilter = filter;
     }

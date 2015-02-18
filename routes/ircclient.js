@@ -48,7 +48,7 @@ module.exports = function(io) {
     io.sockets.on('connection',function(socket){
         socket.emit('init');
         var channels = getChannels();
-        for(var i = 0; i<channels.length; i++) {
+        for(var i in channels) {
             socket.emit('irc:newchannel', {channelname:channels[i]});
         }
 
@@ -107,13 +107,13 @@ module.exports = function(io) {
                     req.on('error', function(err) {
                         console.error(err);
                     })
-                break;
+                    break;
                 case 'join':
                     if (cmd[1]) {
                     console.log('Joining ', cmd.slice(1,cmd.length).join(' '));
                     irc.join(cmd.slice(1,cmd.length).join(' '));
-                }
-                break;
+                    }
+                    break;
                 case 'part' :
                     if (cmd[1]) {
                         console.log('Parting ', cmd[1]);
@@ -135,10 +135,10 @@ module.exports = function(io) {
                             }
                         }
                     }
-                break;
+                    break;
                 case 'clear':
                     socket.emit('irc:clearchat');
-                break;
+                    break;
                 case 'autojoin':
                     if (cmd[1] && cmd[1] == '-') {
                     if(cmd[2]) {
