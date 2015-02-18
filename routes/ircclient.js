@@ -46,6 +46,7 @@ module.exports = function(io) {
     //
 
     io.sockets.on('connection',function(socket){
+        socket.emit('init');
         var channels = getChannels();
         for(var i = 0; i<channels.length; i++) {
             socket.emit('irc:newchannel', {channelname:channels[i]});
@@ -98,7 +99,11 @@ module.exports = function(io) {
                             }
                         });
                     })
+                    req.setTimeout(1000*10);
                     req.end();
+                    req.on('timeout', function() {
+                        console.log('Twitch request has timed out...');
+                    })
                     req.on('error', function(err) {
                         console.error(err);
                     })
@@ -176,7 +181,7 @@ module.exports = function(io) {
     })
 
     irc.addListener('message', function (sFrom, sTo, text, raw) {
-        Channel.addMessage(server,sTo, sFrom, text);
+        //Channel.addMessage(server,sTo, sFrom, text);
         io.sockets.emit('irc:message',  { from: sFrom, channel: sTo, body: text });
     });
 

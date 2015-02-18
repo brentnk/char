@@ -8,7 +8,7 @@ body,.body {
 .flex-site-col {
     display: flex;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     flex-flow: column nowrap;
 }
 
@@ -48,7 +48,6 @@ body,.body {
 .iograph {
     height: 55px;
     width: 100%;
-    border: 1px solid #ddd;
 }
 
 .channel-name {
