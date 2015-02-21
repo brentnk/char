@@ -7,11 +7,11 @@ block body
         .list-group
           a.list-group-item(ng-repeat='(key, value) in channels', ng-click='toggleChannelMessages($event, key)')
             {{key}}
-            span.badge {{value.msgcount}}
+            span.badge {{value.messages.length}}
 
       .main-content
         .ircmessages
-          .ircmessage(ng-repeat="a in messages | filter: chatfilter")
+          .ircmessage(ng-repeat="a in messages() | filter: chatfilter")
             span.channel-name {{a.channel}}
             span.glyphicon.glyphicon-chevron-right
             {{a.from}} - {{a.body}}
@@ -28,8 +28,8 @@ block body
   script(src='/socket.io/socket.io.js')
   script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js')
   script(src='bower_components/angular-socket-io/socket.js')
+  script(src='bower_components/underscore/underscore.js')
   script(src='//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.0.js')
   script(src='js/d3.js')
   script(src='js/app.js')
   script(src='js/controllers.js')
-  script(src='js/test.js')

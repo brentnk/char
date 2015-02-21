@@ -4,8 +4,11 @@
 
 var app = angular.module('myApp', [
   'btford.socket-io',
-  'ui.bootstrap'
+  'ui.bootstrap',
 ]).
-factory('sSocket', function (socketFactory) {
+factory('io', function (socketFactory) {
     return socketFactory();
+}).
+factory('_', function() {
+	return window._;
 });

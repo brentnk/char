@@ -2,31 +2,39 @@
 
 /* Controllers */
 
-function appController($scope, sSocket) {
+function appController($scope, io, _) {
 
+    var commandHistory = [];
+    console.log(_);
     $scope.channels = new Object();
-    $scope.messages = [];
+    $scope.messages = function() {
+        return _.chain($scope.channels)
+            .map(function(x){
+                return x.messages;
+            })
+            .flatten()
+            .sortBy(function(a){ return a.ts })
+            .value();
+    };
 
+    var historyLimit = 70;
     var messageLimitPerChannel = 50;
     var messageLimitGlobal = 40;
     $scope.messsgeLimitView = 75;
 
     //
-    // sSocket listeners
+    // io listeners
     //
 
-    sSocket.on('init', function(data){
+    io.on('init', function(data){
         console.log('init -> []');
         $scope.channels = new Object();
-        $scope.messages = [];
     });
 
-    sSocket.on('irc:message', function(msg){
-        $scope.messages.unshift(msg);
-        $scope.channels[msg.channel].msgcount += 1;
-        while ($scope.messages.length > messageLimitGlobal) {
-            var temp = $scope.messages.pop();
-            $scope.channels[temp.channel].msgcount -= 1;
+    io.on('irc:message', function(msg){
+        $scope.channels[msg.channel].messages.unshift(msg);
+        while ($scope.channels[msg.channel].messages.length > messageLimitPerChannel) {
+            $scope.channels[msg.channel].messages.pop();
         }
         //d3.selectAll('.ircmessage').style('color', function(){
             //return 'hsl(' + (Math.random() * 75 + 160) + ',100%,80%)';
@@ -35,16 +43,16 @@ function appController($scope, sSocket) {
             .style('background', 'hsl(' + (Math.random() * 95 + 160) + ',100%,80%)');
     });
 
-    sSocket.on('irc:newchannel', function(data) {
+    io.on('irc:newchannel', function(data) {
         console.log('irc:newchannel -> ', data.channelname);
         if (!(data.channelname in $scope.channels)) {
             $scope.channels[data.channelname] = new Object();
-            $scope.channels[data.channelname].msgcount = 0;
+            $scope.channels[data.channelname].messages = [];
         }
         console.log(Object.keys($scope.channels));
     });
 
-    sSocket.on('irc:part', function(data) {
+    io.on('irc:part', function(data) {
         console.log('irc:part -> ', data.channelname);
         delete $scope.channels[data.channelname];
     });
@@ -55,8 +63,8 @@ function appController($scope, sSocket) {
 
     $scope.processCmd = function() {
         console.log('processCmd from browser: ', $scope.cmdl);
-        console.log(sSocket);
-        sSocket.emit('cmdline', {raw: $scope.cmdl});
+        io.emit('cmdline', {raw: $scope.cmdl});
+        commandHistory.push($scope.cmdl);
         $scope.cmdl = '';
     }
 
@@ -71,10 +79,10 @@ function appController($scope, sSocket) {
     }
 
     $scope.RequestJoinChannel = function (name) {
-        sSocket.emit('requestChannelJoin', {channelname:name});
+        io.emit('requestChannelJoin', {channelname:name});
     };
     $scope.RequestPartChannel = function (name) {
-        sSocket.emit('requestChannelPart', {channelname:name});
+        io.emit('requestChannelPart', {channelname:name});
     };
 
 }

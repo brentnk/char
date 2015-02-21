@@ -110,8 +110,13 @@ module.exports = function(io) {
                     break;
                 case 'join':
                     if (cmd[1]) {
-                    console.log('Joining ', cmd.slice(1,cmd.length).join(' '));
-                    irc.join(cmd.slice(1,cmd.length).join(' '));
+                        var chans = cmd.slice(1);
+                        for(var i in chans) {
+                            if(chans[i][0] !== '#') {
+                                chans[i] = '#' + chans[i];
+                            }
+                            irc.join(chans[i]);
+                        }
                     }
                     break;
                 case 'part' :
@@ -182,7 +187,7 @@ module.exports = function(io) {
 
     irc.addListener('message', function (sFrom, sTo, text, raw) {
         //Channel.addMessage(server,sTo, sFrom, text);
-        io.sockets.emit('irc:message',  { from: sFrom, channel: sTo, body: text });
+        io.sockets.emit('irc:message',  { from: sFrom, channel: sTo, body: text, ts: Date.now() });
     });
 
     irc.addListener('error', function(message){
@@ -198,6 +203,7 @@ module.exports = function(io) {
     });
 
     irc.addListener('join', function(channel, nick,message){
+        channel = channel.toLowerCase();
         if(ircconfig.nick == nick){
             console.log('I joined ',channel);
             io.sockets.emit('irc:newchannel', {channelname:channel});
