@@ -5,7 +5,7 @@ block body
     .flex-main-row
       .sidebar
         .list-group
-          a.list-group-item(ng-repeat='(key, value) in channels', ng-click='toggleChannelMessages($event, key)')
+          a.list-group-item.list-group-item-success(ng-repeat='(key, value) in channels', ng-click='toggleChannelMessages($event, key)')
             {{key}}
             span.badge {{value.messages.length}}
 
@@ -26,7 +26,7 @@ block body
           input.form-control(type='text', ng-model='cmdl', placeholder='Enter command')
 
   script(src='/socket.io/socket.io.js')
-  script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js')
+  script(src='bower_components/angular/angular.min.js')
   script(src='bower_components/angular-socket-io/socket.js')
   script(src='bower_components/underscore/underscore.js')
   script(src='//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.0.js')

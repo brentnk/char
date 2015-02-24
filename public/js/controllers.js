@@ -2,7 +2,8 @@
 
 /* Controllers */
 
-function appController($scope, io, _) {
+angular.module('myApp.controllers', [])
+.controller('appController',['$scope','io','_',function($scope,io,_) {
 
     var commandHistory = [];
     console.log(_);
@@ -85,4 +86,4 @@ function appController($scope, io, _) {
         io.emit('requestChannelPart', {channelname:name});
     };
 
-}
+}]);
