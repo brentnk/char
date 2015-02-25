@@ -19,59 +19,83 @@ chanSchema.statics.getAllChannels = function() {
 }
 
 chanSchema.statics.addMessage = function(server, channel, user, message) {
-    this.findOne({server:server, channelname: channel}, function(err,doc) {
-        if (err) {
-            console.error('There was an error saving');
-            emitter.emit('addMessage::SaveError');
-        };
-
-        if(!doc) {
-            var newdoc = new Channel({
-                server: server,
-                channelname: channel,
-            });
-
-            newdoc.messages.push({
-                message: message,
-                ts: Date.now(),
-                from: user
-            });
-
-            console.log('Saving doc in new channel');
-            newdoc.save( function (err, unit, numAffected)  {
-                if(err) {
-                    emitter.emit('addMessage::SaveError')
-                    return;
-                }
-
-                if (numAffected < 1) {
-                    emitter.emit('addMessage::SaveError::NoRowsAffected');
-                } else {
-                    emitter.emit('addMessage::DocumentSaved');
-                }
-            });
-        } else {
-            doc.messages.push({
-                message: message,
-                ts: Date.now(),
-                from: user
-            });
-
-            //console.log('Saving message to mongo.');
-            doc.save(function (err, unit, numAffected)  {
-                if(err) {
-                    emitter.emit('addMessage::SaveError')
-                    return;
-                }
-
-                if (numAffected < 1) {
-                    emitter.emit('addMessage::SaveError::NoRowsAffected');
-                } else {
-                    emitter.emit('addMessage::DocumentSaved');
-                }
-            });
-        };
+  this.findOneAndUpdate(
+    {server:server, channelname:channel},
+    {
+      $push: {
+        messages: {
+          message:message,
+          ts: Date.now(),
+          from: user
+          }
+      }
+    },
+    {upsert:true},
+    function(err,doc,numAffected) {
+      if(err) {
+        emitter.emit('addMesssage::SaveError');
+        return;
+      }
+      if (numAffected < 1) {
+        emitter.emit('addMessage::SaveError::NoRowsAffected');
+      } else {
+        emitter.emit('addMessage::DocumentSaved');
+      }
+      return;
     });
+    // this.findOne({server:server, channelname: channel}, function(err,doc) {
+    //     if (err) {
+    //         console.error('There was an error saving');
+    //         emitter.emit('addMessage::SaveError');
+    //     };
+    //
+    //     if(!doc) {
+    //         var newdoc = new Channel({
+    //             server: server,
+    //             channelname: channel,
+    //         });
+    //
+    //         newdoc.messages.push({
+    //             message: message,
+    //             ts: Date.now(),
+    //             from: user
+    //         });
+    //
+    //         console.log('Saving doc in new channel');
+    //         newdoc.save( function (err, unit, numAffected)  {
+    //             if(err) {
+    //                 emitter.emit('addMessage::SaveError')
+    //                 return;
+    //             }
+    //
+    //             if (numAffected < 1) {
+    //                 emitter.emit('addMessage::SaveError::NoRowsAffected');
+    //             } else {
+    //                 emitter.emit('addMessage::DocumentSaved');
+    //             }
+    //         });
+    //     } else {
+    //         doc.messages.push({
+    //             message: message,
+    //             ts: Date.now(),
+    //             from: user
+    //         });
+    //
+    //         //console.log('Saving message to mongo.');
+    //         doc.save(function (err, unit, numAffected)  {
+    //             if(err) {
+    //                 emitter.emit('addMessage::SaveError')
+    //                 return;
+    //             }
+    //
+    //             if (numAffected < 1) {
+    //                 emitter.emit('addMessage::SaveError::NoRowsAffected');
+    //             } else {
+    //                 emitter.emit('addMessage::DocumentSaved');
+    //             }
+    //         });
+    //     };
+    // });
 };
 
 exports = module.exports = Channel = m.model('channel' ,chanSchema);

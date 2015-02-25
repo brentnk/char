@@ -4,21 +4,13 @@ var ircconfig = config.irc;
 var mongoose  = require('mongoose');
 var Channel   = require('../models/channel');
 var appConfig = require('../models/options');
+// var ircUser   = require('../models/irc_user');
 var parser    = require('./parser');
 var options   = require('../models/options');
 var https     = require('https');
+var log       = require('../logger');
 
 //var heapdump = require('heapdump');
-
-var defcb = function(err, user, numberAffected) {
-    if (err) {
-        console.log('There was an error: ', err);
-        return;
-    };
-
-    console.log('Message was added... rows affected ', numberAffected);
-    return;
-};
 
 module.exports = function(io) {
     server = ircconfig.server;
@@ -32,7 +24,6 @@ module.exports = function(io) {
     }
 
     mongoose.connect(config.db.connectionString);
-
 
     if (config.heapdump) {
 
@@ -54,25 +45,26 @@ module.exports = function(io) {
 
         socket.on('cmdline', function(data){
             if(!data.raw || data.raw.length < 1) {
-                console.log('Blank command received');
+                log.info('Blank command received');
                 return;
             }
             var cmd = parser(data.raw).data[0];
-            console.log(cmd);
+            log.info(cmd);
             if(!cmd || cmd.length < 1) {
-                console.log('Invalid command');
+                log.info('Invalid command');
                 return;
             }
 
+            log.info({raw: data}, 'socket.io cmdline received');
+
             switch(cmd[0]) {
                 case 'top':
-                    console.log(typeof(cmd[1]));
                     if(cmd[1] && !isNaN(parseInt(cmd[1],10)) && cmd[1] > 0) {
                         limit = Number(cmd[1]);
                     } else {
                         limit = 5;
                     }
-                    console.log('limit:',limit);
+                    log.info('limit:',limit);
                     var options = {
                         hostname: config.twitchApi.base,
                         headers: config.twitchApi.header,
@@ -102,10 +94,10 @@ module.exports = function(io) {
                     req.setTimeout(1000*10);
                     req.end();
                     req.on('timeout', function() {
-                        console.log('Twitch request has timed out...');
+                        log.error('Twitch request has timed out...');
                     })
                     req.on('error', function(err) {
-                        console.error(err);
+                        log.error({error:err}, 'Twitch request has encountered an error');
                     })
                     break;
                 case 'join':
@@ -121,22 +113,21 @@ module.exports = function(io) {
                     break;
                 case 'part' :
                     if (cmd[1]) {
-                        console.log('Parting ', cmd[1]);
+                        log.info('Parting ', cmd[1]);
                         if(irc.chanData(cmd[1])) {
                             irc.part(cmd[1]);
                         } else {
-                            console.log('Not connected to ', cmd[1]);
+                            log.info('Not connected to ', cmd[1]);
                         }
                         //socket.emit('irc:chandc', {channelname: cmd[1]});
                     } else {
-                        console.log('Parting all channels');
                         var chans = getChannels();
-                        console.log(chans);
+                        log.info({channel_list: chans}, 'Parting all channels');
                         for(var chan in chans) {
                             if(irc.chanData(chans[chan])) {
                                 irc.part(chans[chan]);
                             } else {
-                                console.log('Not connected to ', chans[chan]);
+                                log.warn('Not connected to ', chans[chan]);
                             }
                         }
                     }
@@ -160,7 +151,7 @@ module.exports = function(io) {
                 }
                 break;
                 default:
-                    console.log('Command not recognized');
+                    log.info('Command not recognized');
             }
         });
     });
@@ -169,43 +160,34 @@ module.exports = function(io) {
     // IRC Client Routes
     //
 
-    //irc.addListener('raw', function(msg) {
-    //console.log(msg);
-    //})
+    irc.addListener('raw', function(raw) {
+      log.info({irc_message: raw});
+    });
 
     irc.addListener('registered', function() {
         getAutoJoins(function(err,res) {
             if(err) {return;}
-            //console.log(res,res.length);
             for(var a in res) {
-                console.log(res[a].value);
                 irc.join(res[a].value);
             }
         });
 
-    })
-
-    irc.addListener('message', function (sFrom, sTo, text, raw) {
-        //Channel.addMessage(server,sTo, sFrom, text);
-        io.sockets.emit('irc:message',  { from: sFrom, channel: sTo, body: text, ts: Date.now() });
     });
 
-    irc.addListener('error', function(message){
-        console.log('There was an error: ' + message);
+    irc.addListener('message', function (sFrom, sTo, text, raw) {
+      Channel.addMessage(server,sTo, sFrom, text);
+      io.sockets.emit('irc:message',  { from: sFrom, channel: sTo, body: text, ts: Date.now() });
     });
 
     irc.addListener('part', function(channel, nick, reason, message) {
-        //console.log('part',channel,nick,reason,message);
         if(ircconfig.nick == nick) {
-            console.log('I left ',channel);
             io.sockets.emit('irc:part', {channelname:channel});
         }
     });
 
-    irc.addListener('join', function(channel, nick,message){
+    irc.addListener('join', function(channel, nick){
         channel = channel.toLowerCase();
         if(ircconfig.nick == nick){
-            console.log('I joined ',channel);
             io.sockets.emit('irc:newchannel', {channelname:channel});
         }
     });

@@ -6,7 +6,6 @@ angular.module('myApp.controllers', [])
 .controller('appController',['$scope','io','_',function($scope,io,_) {
 
     var commandHistory = [];
-    console.log(_);
     $scope.channels = new Object();
     $scope.messages = function() {
         return _.chain($scope.channels)
@@ -27,9 +26,18 @@ angular.module('myApp.controllers', [])
     // io listeners
     //
 
+    var initChart = function() {
+      var chartArea = d3.select('.iograph');
+      var svg = d3.select('.iograph').append('svg')
+        .attr('height', '100%')
+        .attr('width', '100%');
+    }
+
     io.on('init', function(data){
         console.log('init -> []');
         $scope.channels = new Object();
+
+        initChart();
     });
 
     io.on('irc:message', function(msg){
