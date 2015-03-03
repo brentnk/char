@@ -4,3 +4,4 @@ appconfig.js
 *.test.*
 public/bower_components/**
 charbot.log
+.vagrant

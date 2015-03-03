@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
   config.vm.box = "hashicorp/precise64"
 
   config.vm.synced_folder "./", "/workspace"
-  config.vm.synced_folder "e:/elasticsearch/", "/elasticsearch"
+  # config.vm.synced_folder "/elasticsearch/", "/elasticsearch"
 
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 

@@ -9,6 +9,7 @@ var parser    = require('./parser');
 var options   = require('../models/options');
 var https     = require('https');
 var log       = require('../logger');
+var elastic   = require('elasticsearch');
 
 //var heapdump = require('heapdump');
 
@@ -24,6 +25,30 @@ module.exports = function(io) {
     }
 
     mongoose.connect(config.db.connectionString);
+
+    var esClient = elastic.Client({
+      requestTimeout:3000
+    });
+
+    esClient.indices.create({
+      index: 'irc'
+    });
+    esClient.indices.putMapping({
+      index: 'irc',
+      type: 'ircmsg',
+      body : {
+        ircmsg: {
+          properties: {
+            _timestamp: {
+              enabled: true,
+              store: true,
+              format: "YYYY-MM-dd'T'HH:mm:ss.SSS'Z'",
+              path: '@timestamp'
+            }
+          }
+        }
+      }
+    });
 
     if (config.heapdump) {
 
@@ -162,6 +187,18 @@ module.exports = function(io) {
 
     irc.addListener('raw', function(raw) {
       log.info({irc_message: raw});
+      raw.timestamp = Date.now();
+      esClient.create({
+        index: 'irc',
+        type: 'ircmessage',
+        body: raw
+      }, function(err,res) {
+        if(err) {
+          log.error(err);
+        } else {
+          log.info(res);
+        }
+      });
     });
 
     irc.addListener('registered', function() {
