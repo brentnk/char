@@ -15,16 +15,6 @@ var log    = logger.createLogger(
         path: './charbot.log',
         period: '3d',
         count: 10
-      },
-      // {
-      //
-      // }
-      // {
-      //   stream: esStream
-      // }
-      // ,
-      {
-        stream: process.stderr
       }
     ]
   });

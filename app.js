@@ -55,7 +55,7 @@ app.get('/api/name', api.name);
 app.get('*', routes.index);
 
 // IRC Client and socket handler
-var client = require('./routes/ircclient')(io);
+var client = require('./server/ircclient')(io);
 
 // Start server
 server.listen(app.get('port'), function () {

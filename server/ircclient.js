@@ -10,12 +10,24 @@ var options   = require('../models/options');
 var https     = require('https');
 var log       = require('../logger');
 var elastic   = require('elasticsearch');
+var twitch    = require('./twitch');
 
 //var heapdump = require('heapdump');
 
+// Gets the top channels from twitch api and joins them.
+
+
 module.exports = function(io) {
+    var components = {};
+
     server = ircconfig.server;
     var irc = new _irc.Client(ircconfig.server, ircconfig.nick, ircconfig.options);
+    var esClient = elastic.Client({
+      requestTimeout:3000
+    });
+
+    components.ircClient = irc;
+    components.esClient  = esclient;
 
     var getChannels = function() {
         return Object.keys(irc.chans)
@@ -26,24 +38,28 @@ module.exports = function(io) {
 
     mongoose.connect(config.db.connectionString);
 
-    var esClient = elastic.Client({
-      requestTimeout:3000
-    });
+
+    var commands = [];
+    commands.push(top);
+
 
     esClient.indices.create({
-      index: 'irc'
-    });
-    esClient.indices.putMapping({
       index: 'irc',
-      type: 'ircmsg',
       body : {
-        ircmsg: {
-          properties: {
+        mappings: {
+          ircmsg: {
             _timestamp: {
               enabled: true,
               store: true,
-              format: "YYYY-MM-dd'T'HH:mm:ss.SSS'Z'",
-              path: '@timestamp'
+              format: "YYYY-MM-dd'T'HH:mm:ss.SSS'Z'"
+            },
+            properties: {
+              '@timestamp': {
+                type: 'date',
+                enabled: true,
+                store: true,
+                format: "YYYY-MM-dd'T'HH:mm:ss.SSS'Z'"
+              }
             }
           }
         }
@@ -84,46 +100,8 @@ module.exports = function(io) {
 
             switch(cmd[0]) {
                 case 'top':
-                    if(cmd[1] && !isNaN(parseInt(cmd[1],10)) && cmd[1] > 0) {
-                        limit = Number(cmd[1]);
-                    } else {
-                        limit = 5;
-                    }
-                    log.info('limit:',limit);
-                    var options = {
-                        hostname: config.twitchApi.base,
-                        headers: config.twitchApi.header,
-                        path: '/kraken/streams',
-                        method: 'GET'
-                    };
-                    var req = https.request(options , function(res) {
-                        res.setEncoding('utf8');
-                        var str = '';
 
-                        res.on('data', function(chunk) {
-                            str += chunk;
-                        });
 
-                        res.on('end', function(){
-                            var streams = JSON.parse(str);
-                            if('streams' in streams && streams['streams'].length > 0){
-                                var top = streams['streams'].slice(0,limit);
-                                for(var i = 0; i < top.length; i++) {
-                                    if ('channel' in top[i]) {
-                                        irc.join('#' + top[i].channel.display_name);
-                                    }
-                                }
-                            }
-                        });
-                    })
-                    req.setTimeout(1000*10);
-                    req.end();
-                    req.on('timeout', function() {
-                        log.error('Twitch request has timed out...');
-                    })
-                    req.on('error', function(err) {
-                        log.error({error:err}, 'Twitch request has encountered an error');
-                    })
                     break;
                 case 'join':
                     if (cmd[1]) {
@@ -137,25 +115,7 @@ module.exports = function(io) {
                     }
                     break;
                 case 'part' :
-                    if (cmd[1]) {
-                        log.info('Parting ', cmd[1]);
-                        if(irc.chanData(cmd[1])) {
-                            irc.part(cmd[1]);
-                        } else {
-                            log.info('Not connected to ', cmd[1]);
-                        }
-                        //socket.emit('irc:chandc', {channelname: cmd[1]});
-                    } else {
-                        var chans = getChannels();
-                        log.info({channel_list: chans}, 'Parting all channels');
-                        for(var chan in chans) {
-                            if(irc.chanData(chans[chan])) {
-                                irc.part(chans[chan]);
-                            } else {
-                                log.warn('Not connected to ', chans[chan]);
-                            }
-                        }
-                    }
+                    
                     break;
                 case 'clear':
                     socket.emit('irc:clearchat');
@@ -187,18 +147,8 @@ module.exports = function(io) {
 
     irc.addListener('raw', function(raw) {
       log.info({irc_message: raw});
-      raw.timestamp = Date.now();
-      esClient.create({
-        index: 'irc',
-        type: 'ircmessage',
-        body: raw
-      }, function(err,res) {
-        if(err) {
-          log.error(err);
-        } else {
-          log.info(res);
-        }
-      });
+      raw['@timestamp'] = Date.now();
+
     });
 
     irc.addListener('registered', function() {
@@ -208,10 +158,25 @@ module.exports = function(io) {
                 irc.join(res[a].value);
             }
         });
-
     });
 
     irc.addListener('message', function (sFrom, sTo, text, raw) {
+      esClient.create({
+        index: 'irc',
+        type: 'ircmsg',
+        body: {
+          '@timestamp': Date.now(),
+          from: sFrom,
+          to: sTo,
+          text: text
+        }
+      }, function(err,res) {
+        if(err) {
+          log.error(err);
+        } else {
+          log.info(res);
+        }
+      });
       Channel.addMessage(server,sTo, sFrom, text);
       io.sockets.emit('irc:message',  { from: sFrom, channel: sTo, body: text, ts: Date.now() });
     });
