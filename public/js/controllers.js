@@ -78,9 +78,7 @@ angular.module('myApp.controllers', [])
     }
 
     $scope.toggleChannelMessages = function(e,key) {
-        if(key in tags) {
-
-        }
+      // TODO
     }
 
     $scope.chatFilter = function(filter) {

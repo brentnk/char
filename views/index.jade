@@ -22,7 +22,11 @@ block body
       form(ng-submit='processCmd()')
         .input-group
           span.input-group-btn#basic-addon1
-            button.btn.btn-default(type='button') &lambda;
+            button.btn.btn-default.dropdown-toggle(type='button') Action
+              ul.dropdown-menu(role='menu')
+                li Join
+                li Part
+                li Top
           input.form-control(type='text', ng-model='cmdl', placeholder='Enter command')
 
   script(src='/socket.io/socket.io.js')
