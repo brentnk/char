@@ -1,0 +1,17 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<script src="/socket.io/socket.io.js" charset="utf-8"></script>
+<polymer-element name='char-socket' attributes='socket'>
+  <script>
+    (function() {
+      var socket = io('http://localhost:7777');
+      Polymer({
+        ready: function() {
+          this.socket = socket;
+          this.socket.on('init', function(data) {
+            console.log('init message received');
+          });
+        }
+      });
+    })();
+  </script>
+</polymer-element>

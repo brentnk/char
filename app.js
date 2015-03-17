@@ -46,9 +46,7 @@ if (app.get('env') === 'production') {
 
 // serve index and view partials
 app.get('/', routes.index);
-app.get('/beta', function(req,res) {
-  res.render('indexbeta.jade');
-});
+app.get('/beta', routes.indexbeta);
 app.get('/partials/:name', routes.partials);
 
 // JSON API

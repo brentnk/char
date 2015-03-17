@@ -1,29 +1,31 @@
 doctype html
-html(ng-app='myApp')
+html
   head
-    title unquote
+    title ChRboT
     meta(charset='utf8', name='viewport', content='width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes')
     script(src='bower_components/webcomponentsjs/webcomponents.js')
     link(rel='import', href='bower_components/core-toolbar/core-toolbar.html')
     link(rel='import', href='bower_components/paper-input/paper-input.html')
     link(rel='import', href='bower_components/paper-item/paper-item.html')
+    link(rel='import', href='bower_components/paper-item/paper-button.html')
     link(rel='import', href='bower_components/core-menu/core-menu.html')
     link(rel='import', href='bower_components/core-drawer-panel/core-drawer-panel.html')
     link(rel='import', href='bower_components/core-header-panel/core-header-panel.html')
-  body(fullbleed='', layout='', vertical='', unresolved='', ng-controller='appController')
+    link(rel="import", href="bower_components/polymer/polymer.html")
+    link(rel='import', href='elements/my-test.html')
+    link(rel='import', href='elements/char-socket.html')
+    link(rel='import', href='elements/irc-channel-list.html')
+  body(fullbleed='', layout='', vertical='', unresolved='')
     core-header-panel(flex='')
       core-toolbar#mainheader
         paper-icon-button#navicon(icon='arrow-back')
         div
-          | Charbot {{1+1}}
-      core-drawer-panel
-        div(drawer='')
-          core-list(data='{{channels}}')
-            template
-    script(src='/socket.io/socket.io.js')
-    script(src='bower_components/angular/angular.min.js')
-    script(src='bower_components/angular-socket-io/socket.js')
+          | Charbot
+      core-drawer-panel(fit='')
+        div(drawer='' fit='')
+          irc-channel-list
+        div(main='',fit='')
+          my-test(fit)
+          char-socket
     script(src='bower_components/underscore/underscore.js')
     script(src='js/d3.js')
-    script(src='js/app.js')
-    script(src='js/controllers.js')

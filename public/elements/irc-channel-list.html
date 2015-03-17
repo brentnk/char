@@ -1,0 +1,33 @@
+<polymer-element name='irc-channel-list'>
+  <template>
+    <style>
+    :host {
+      background-color: #DAD;
+      height: 100px;
+    }
+    </style>
+    <char-socket id='socket' socket='{{socket}}'></char-socket>
+    <core-list data='{{testdata}}' fit>
+      <template>
+        <paper-button>{{model.channel}}</paper-button>
+      </template>
+    </core-list>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        this.channels = [];
+        this.testdata = [{channel:'bob',selected:true},
+          {channel:'dave',selected:true},
+          {channel:'jer',selected:true}];
+        this.socket.on('irc:newchannel', this.newIrcChannel.bind(this));
+      },
+      newIrcChannel: function(data) {
+        if(data && 'channelname' in data) {
+          this.channels.push({channel: data.channelname, selected: false});
+          console.log(this.channels);
+        }
+      }
+    });
+  </script>
+</polymer-element>

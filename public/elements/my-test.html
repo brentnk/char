@@ -1,0 +1,21 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<script src="/socket.io/socket.io.js" charset="utf-8"></script>
+<polymer-element name='my-test'>
+  <template>
+    <div style='overflow:auto;'>
+      <core-list id='list' data='{{data}}' fit>
+        <template>
+        <div>
+          {{model.name}} is here muthafucka!
+        </div>
+        </template>
+      </core-list>
+    </div>
+  </template>
+  <script>
+    Polymer({
+        data: [{name:'Hadria'},{name:'Avadeus'},{name:'Luv.Sic'}]
+
+    });
+  </script>
+</polymer-element>

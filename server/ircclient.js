@@ -22,7 +22,7 @@ module.exports = function(io) {
         options.find({key:'autojoin'}).select('value').exec(callback);
     }
 
-    mongoose.connect(config.db.connectionString);
+    // mongoose.connect(config.db.connectionString);
 
     var es = elastic.Client({
       requestTimeout:3000
@@ -61,6 +61,7 @@ module.exports = function(io) {
         socket.emit('init');
         var channels = getChannels();
         // Initial connection sends all channels to the client.
+        socket.emit('irc:newchannel', {channelname: '<<blank>>'});
         for(var i in channels) {
             socket.emit('irc:newchannel', {channelname:channels[i]});
         };

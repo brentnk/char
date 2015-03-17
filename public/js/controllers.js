@@ -5,6 +5,7 @@
 angular.module('myApp.controllers', [])
 .controller('appController',['$scope','io','_',function($scope,io,_) {
 
+    $scope.test = ['bill','john','hank'];
     var commandHistory = [];
     $scope.channels = new Object();
     $scope.messages = function() {

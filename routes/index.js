@@ -1,6 +1,9 @@
 /*
  * GET home page.
  */
+exports.indexbeta = function(req,res) {
+  res.render('indexbeta');
+};
 
 exports.index = function(req, res){
     res.render('index');
