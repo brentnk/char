@@ -3,5 +3,6 @@ irc.config.js
 appconfig.js
 *.test.*
 public/bower_components/**
-charbot.log
+charbot.log*
 .vagrant
+npm-debug.log

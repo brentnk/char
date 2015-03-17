@@ -61,9 +61,8 @@ module.exports = function(io) {
         socket.emit('init');
         var channels = getChannels();
         // Initial connection sends all channels to the client.
-        socket.emit('irc:newchannel', {channelname: '<<blank>>'});
         for(var i in channels) {
-            socket.emit('irc:newchannel', {channelname:channels[i]});
+            socket.emit('irc:newchannel', {channel:channels[i]});
         };
 
         socket.on('irc:join', function(data) {
@@ -138,14 +137,14 @@ module.exports = function(io) {
 
     irc.addListener('part', function(channel, nick, reason, message) {
         if(ircconfig.nick == nick) {
-            io.sockets.emit('irc:part', {channelname:channel});
+            io.sockets.emit('irc:part', {channel:channel});
         }
     });
 
     irc.addListener('join', function(channel, nick){
         channel = channel.toLowerCase();
         if(ircconfig.nick == nick){
-            io.sockets.emit('irc:newchannel', {channelname:channel});
+            io.sockets.emit('irc:newchannel', {channel:channel});
         }
     });
 }

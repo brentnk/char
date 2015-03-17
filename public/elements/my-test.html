@@ -2,20 +2,18 @@
 <script src="/socket.io/socket.io.js" charset="utf-8"></script>
 <polymer-element name='my-test'>
   <template>
-    <div style='overflow:auto;'>
-      <core-list id='list' data='{{data}}' fit>
-        <template>
+    <core-list id='list' data='{{data}}' fit>
+      <template>
         <div>
-          {{model.name}} is here muthafucka!
+          The {{model.name}} are here!
         </div>
-        </template>
-      </core-list>
-    </div>
+      </template>
+    </core-list>
   </template>
   <script>
-    Polymer({
-        data: [{name:'Hadria'},{name:'Avadeus'},{name:'Luv.Sic'}]
+  Polymer({
+    data: [{name:'ice creams'},{name:'poptarts'},{name:'donuts'}]
 
-    });
+  });
   </script>
 </polymer-element>

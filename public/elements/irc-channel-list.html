@@ -1,33 +1,63 @@
 <polymer-element name='irc-channel-list'>
   <template>
     <style>
-    :host {
-      background-color: #DAD;
-      height: 100px;
-    }
+      core-icon-button[icon=remove] {
+        color: #900;
+      }
     </style>
-    <char-socket id='socket' socket='{{socket}}'></char-socket>
-    <core-list data='{{testdata}}' fit>
-      <template>
-        <paper-button>{{model.channel}}</paper-button>
-      </template>
-    </core-list>
+    <div layout vertical fit>
+      <char-socket id='socket' socket='{{socket}}'></char-socket>
+      <paper-input id='input' label='Channel Name' on-keyup='{{inputChange}}'></paper-input>
+      <core-list data='{{channels}}' style='height: 100%;'>
+        <template>
+          <core-selector>
+            <paper-item>
+              {{model.channel}}
+              <span flex></span>
+              <core-icon-button icon='remove' on-click='{{remove}}'></core-icon-button>
+            </paper-item>
+          </core-selector>
+        </template>
+      </core-list>
+    </div>
+    <paper-toast class='capsule' id='jointoast' small></paper-toast>
   </template>
   <script>
-    Polymer({
-      ready: function() {
-        this.channels = [];
-        this.testdata = [{channel:'bob',selected:true},
-          {channel:'dave',selected:true},
-          {channel:'jer',selected:true}];
-        this.socket.on('irc:newchannel', this.newIrcChannel.bind(this));
-      },
-      newIrcChannel: function(data) {
-        if(data && 'channelname' in data) {
-          this.channels.push({channel: data.channelname, selected: false});
-          console.log(this.channels);
+  Polymer({
+    ready: function() {
+      this.channels = [];
+      this.socket.on('irc:newchannel', this.ircNewChannel.bind(this));
+      this.socket.on('irc:part', this.ircPart.bind(this));
+    },
+    ircNewChannel: function(data) {
+      if(data && 'channel' in data) {
+        this.channels.push({channel: data.channel, selected: false});
+        this.$.jointoast.text = 'Joined ' + data.channel;
+        this.$.jointoast.show();
+      }
+    },
+    ircPart: function(data) {
+      if(data && 'channel' in data) {
+        this.channels = _.reject(this.channels, function(x){x.channel == data.channel});
+      }
+    },
+    inputChange: function(e) {
+      e.which = e.which || e.keyCode;
+      if(this.$.input.value) {
+        var value = this.$.input.value;
+        if(this.$.input.value && !(this.$.input.value[0] == '#')){
+          this.$.input.value = '#' + this.$.input.value;
+        }
+        if(e.which == 13) {
+          this.lastJoin = value;
+          this.$.input.value = '';
+          this.socket.emit('irc:join', {channel: value});
         }
       }
-    });
+    },
+    remove: function(e) {
+      console.log(e);
+    }
+  });
   </script>
 </polymer-element>
