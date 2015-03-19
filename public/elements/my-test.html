@@ -2,7 +2,13 @@
   <template>
     <char-socket id='socket' socket={{socket}}></char-socket>
     <div id='area' fit>
-
+      <core-list data='{{esData}}' style='height:100%; width:300px;'>
+        <template>
+          <div>
+            {{model['_source'].body}}
+          </div>
+        </template>
+      </core-list>
     </div>
   </template>
   <script>
@@ -21,7 +27,13 @@
           .text(function(d) {return d.name;});
     },
     handleES: function(data) {
-      console.log(data);
+      this.esData = data.hits.hits;
+      // d3.select(this.$.area).selectAll('div')
+      //   .data(this.esData)
+      //   .enter().append('div')
+      //     .style('font-size', '.80em')
+      //     .text(function(a) {return a['_source'].body;});
+      console.log(this.esData);
     },
     testEsQuery: function() {
       var data = {
