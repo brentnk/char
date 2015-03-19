@@ -1,7 +1,7 @@
 <polymer-element name='irc-channel-list'>
   <template>
     <style>
-      core-icon-button[icon=remove] {
+      core-icon-button[icon=remove-circle-outline] {
         color: #900;
       }
     </style>
@@ -14,7 +14,7 @@
             <paper-item>
               {{model.channel}}
               <span flex></span>
-              <core-icon-button icon='remove' on-click='{{remove}}'></core-icon-button>
+              <core-icon-button icon='remove-circle-outline' on-click='{{remove}}' channel='{{model.channel}}'></core-icon-button>
             </paper-item>
           </core-selector>
         </template>
@@ -32,13 +32,14 @@
     ircNewChannel: function(data) {
       if(data && 'channel' in data) {
         this.channels.push({channel: data.channel, selected: false});
-        this.$.jointoast.text = 'Joined ' + data.channel;
-        this.$.jointoast.show();
+        this.toast('Joined ' + data.channel);
       }
     },
     ircPart: function(data) {
       if(data && 'channel' in data) {
-        this.channels = _.reject(this.channels, function(x){x.channel == data.channel});
+        this.channels = _.reject(this.channels, function(x){return x.channel.toLowerCase() == data.channel.toLowerCase();});
+        console.log(_.reject(this.channels, function(x){return x.channel.toLowerCase() == data.channel.toLowerCase();}));
+        this.toast('Parted ' + data.channel);
       }
     },
     inputChange: function(e) {
@@ -55,8 +56,18 @@
         }
       }
     },
-    remove: function(e) {
-      console.log(e);
+    remove: function(event,detail,sender) {
+      var channel = sender.getAttribute('channel');
+      console.log(event.toElement);
+      console.log(detail);
+      console.log(sender.getAttribute('channel'));
+      if(channel){
+        this.socket.emit('irc:part', {channel: channel});
+      }
+    },
+    toast: function(text) {
+      this.$.jointoast.text = text;
+      this.$.jointoast.show();
     }
   });
   </script>

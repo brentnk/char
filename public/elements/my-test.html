@@ -1,19 +1,36 @@
-<link rel="import" href="/bower_components/polymer/polymer.html">
-<script src="/socket.io/socket.io.js" charset="utf-8"></script>
 <polymer-element name='my-test'>
   <template>
-    <core-list id='list' data='{{data}}' fit>
-      <template>
-        <div>
-          The {{model.name}} are here!
-        </div>
-      </template>
-    </core-list>
+    <char-socket id='socket' socket={{socket}}></char-socket>
+    <div id='area' fit>
+
+    </div>
   </template>
   <script>
   Polymer({
-    data: [{name:'ice creams'},{name:'poptarts'},{name:'donuts'}]
+    data: [{name:'ice creams', cost:15},{name:'poptarts', cost: 12},{name:'donuts', cost: 3}, {name:'peanuts', cost: 22}],
+    ready: function() {
+      var sel = d3.select(this.$.area);
+      var cScale =  d3.scale.linear().domain([3,12,15]).range([1,1.25,1.5]);
+      console.log(cScale);
+      console.log(sel);
+      this.socket.on('es:query', this.handleES.bind(this));
+      this.testEsQuery();
+      sel.selectAll('div').data(this.data)
+        .enter().append('div')
+          .style('font-size', function(d){return cScale(d.cost)+'em'})
+          .text(function(d) {return d.name;});
+    },
+    handleES: function(data) {
+      console.log(data);
+    },
+    testEsQuery: function() {
+      var data = {
+        index: 'irc',
+        type: 'ircmsg'
+      };
 
+      this.socket.emit('es:query', data);
+    }
   });
   </script>
 </polymer-element>

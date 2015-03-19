@@ -16,10 +16,11 @@ html
     link(rel="import", href="bower_components/core-selector/core-selector.html")
     link(rel="import", href="bower_components/core-icon-button/core-icon-button.html")
     link(rel="import", href="bower_components/polymer/polymer.html")
-    link(rel='import', href='elements/my-test.html')
     link(rel='import', href='elements/char-socket.html')
+    link(rel='import', href='elements/my-test.html')
     link(rel='import', href='elements/irc-channel-list.html')
     link(rel='stylesheet', href='css/betaindex.css')
+    script(src='bower_components/d3/d3.js')
   body(fullbleed='', layout='', vertical='', unresolved='')
     core-header-panel(flex='')
       core-toolbar#mainheader
@@ -30,5 +31,5 @@ html
         div.drawer(drawer)
           irc-channel-list
         div.main(main,flex)
+          my-test(fit)
     script(src='bower_components/underscore/underscore.js')
-    script(src='js/d3.js')
