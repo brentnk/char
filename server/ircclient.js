@@ -95,7 +95,6 @@ module.exports = function(io) {
       var index = data.index || '*';
       var type = data.type || '*';
       var query = data.query || {match_all:{}}
-      console.log(new Date(lowdate), new Date(highdate));
       var s = es.search({
         index: index,
         type: type,

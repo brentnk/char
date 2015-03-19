@@ -6,9 +6,6 @@
       Polymer({
         ready: function() {
           this.socket = socket;
-          this.socket.on('init', function(data) {
-            console.log('init message received');
-          });
         }
       });
     })();

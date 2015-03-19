@@ -2,7 +2,28 @@
   <template>
     <style>
       core-icon-button[icon=remove-circle-outline] {
-        color: #900;
+        color: #E3F983;
+      }
+      div {
+        background: #2E4347;
+      }
+
+      div > .right-inner {
+        position: absolute;
+        top: 0em;
+        right: 0em;
+        width: 4px;
+        height: 100%;
+        background: #085E9F;
+      }
+      div > .right-inner-2 {
+        margin-right: 4px;
+        background: #1CD9A4;
+      }
+      .list-item > div {
+        font-size: 1.25em;
+        color: #E3F983;
+        margin: auto;
       }
     </style>
     <div layout vertical fit>
@@ -10,15 +31,15 @@
       <paper-input id='input' label='Channel Name' on-keyup='{{inputChange}}'></paper-input>
       <core-list data='{{channels}}' style='height: 100%;'>
         <template>
-          <core-selector>
-            <paper-item>
-              {{model.channel}}
-              <span flex></span>
-              <core-icon-button icon='remove-circle-outline' on-click='{{remove}}' channel='{{model.channel}}'></core-icon-button>
-            </paper-item>
-          </core-selector>
+          <div class='list-item' flex horizontal layout>
+            <div>{{model.channel}}</div>
+            <span flex></span>
+            <core-icon-button icon='remove-circle-outline' on-click='{{remove}}' channel='{{model.channel}}'></core-icon-button>
+          </div>
         </template>
       </core-list>
+      <div class='right-inner'></div>
+      <div class='right-inner right-inner-2'></div>
     </div>
     <paper-toast class='capsule' id='jointoast' small></paper-toast>
   </template>
@@ -34,6 +55,9 @@
         this.channels.push({channel: data.channel, selected: false});
         this.toast('Joined ' + data.channel);
       }
+    },
+    ircInit: function() {
+      this.channels = [];
     },
     ircPart: function(data) {
       if(data && 'channel' in data) {
