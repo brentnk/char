@@ -1,19 +1,18 @@
 <polymer-element name='my-test'>
   <template>
     <char-socket id='socket' socket={{socket}}></char-socket>
+    <style>
+      #area {
+        background: #222;
+        border: 3px;
+      }
+    </style>
     <div id='area' fit>
-      <core-list data='{{esData}}' style='height:100%; width:300px;'>
-        <template>
-          <div>
-            {{model['_source'].body}}
-          </div>
-        </template>
-      </core-list>
+
     </div>
   </template>
   <script>
   Polymer({
-    data: [{name:'ice creams', cost:15},{name:'poptarts', cost: 12},{name:'donuts', cost: 3}, {name:'peanuts', cost: 22}],
     ready: function() {
       var sel = d3.select(this.$.area);
       var cScale =  d3.scale.linear().domain([3,12,15]).range([1,1.25,1.5]);
@@ -21,19 +20,10 @@
       console.log(sel);
       this.socket.on('es:query', this.handleES.bind(this));
       this.testEsQuery();
-      sel.selectAll('div').data(this.data)
-        .enter().append('div')
-          .style('font-size', function(d){return cScale(d.cost)+'em'})
-          .text(function(d) {return d.name;});
     },
     handleES: function(data) {
       this.esData = data.hits.hits;
-      // d3.select(this.$.area).selectAll('div')
-      //   .data(this.esData)
-      //   .enter().append('div')
-      //     .style('font-size', '.80em')
-      //     .text(function(a) {return a['_source'].body;});
-      console.log(this.esData);
+      this.esData.speakers = _.uniq(_.map(this.esData,function(a) {return a['_source'].from}));
     },
     testEsQuery: function() {
       var data = {

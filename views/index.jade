@@ -6,7 +6,7 @@ block body
       .sidebar
         .list-group
           a.list-group-item.list-group-item-success(ng-repeat='(key, value) in channels', ng-click='toggleChannelMessages($event, key)')
-            {{key}}
+            | {{key}}
             span.badge {{value.messages.length}}
 
       .main-content
@@ -14,7 +14,7 @@ block body
           .ircmessage(ng-repeat="a in messages() | filter: chatfilter")
             span.channel-name {{a.channel}}
             span.glyphicon.glyphicon-chevron-right
-            {{a.from}} - {{a.body}}
+            | {{a.from}} - {{a.body}}
 
     .iograph {{test}}
 

@@ -94,6 +94,7 @@ module.exports = function(io) {
       var highdate = data.highdate || Date.now();
       var index = data.index || '*';
       var type = data.type || '*';
+      var query = data.query || {match_all:{}}
       console.log(new Date(lowdate), new Date(highdate));
       var s = es.search({
         index: index,
@@ -102,6 +103,7 @@ module.exports = function(io) {
         body: {
           query: {
             filtered: {
+              query: query,
               filter: {
                 range: {
                   '@timestamp': {

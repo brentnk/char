@@ -27,7 +27,7 @@ var irc    = require('irc');
 app.set('port', process.env.PORT || 7777);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
-app.use(morgan('dev'));
+// app.use(morgan('tiny'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride());
 app.use(staticServe(path.join(__dirname, 'public')));
