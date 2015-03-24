@@ -22,15 +22,17 @@ Vagrant.configure(2) do |config|
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
   config.vm.network "private_network", type: "dhcp"
-  config.vm.network "forwarded_port", guest:5601, host:5601
-  config.vm.network "forwarded_port", guest:5000, host:5000
-  config.vm.network "forwarded_port", guest:9200, host:9200
+  config.vm.network "forwarded_port", guest:5601, host:5602
 
   # config.vm.provision "docker"
   config.vm.provision "docker" do |d|
-    d.pull_images "sebp/elk"
-    d.run  "sebp/elk",
+    # d.pull_images "sebp/elk"
+    d.pull_images "elasticsearch"
+    d.run "elasticsearch",
       auto_assign_name: false,
-      args: "-p 5601:5601 -p 9200:9200 -p 5000:5000 -v /elasticsearch:/elasticsearch -it --name elk"
+      args: "-p 5601:5601 -v /elasticsearch:/elasticsearch -it --name es"
+    # d.run  "sebp/elk",
+    #   auto_assign_name: false,
+    #   args: "-p 5601:5601 -p 9200:9200 -p 5000:5000 -v /elasticsearch:/elasticsearch -it --name elk"
   end
 end
