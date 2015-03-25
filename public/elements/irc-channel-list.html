@@ -5,15 +5,7 @@
         color: #E3F983;
       }
       div {
-        /*background: #2E4347;*/
-        background: #a90329; /* Old browsers */
-        background: -moz-linear-gradient(left,  #a90329 0%, #6d0019 7%, #330000 48%, #6d0019 84%, #870002 99%); /* FF3.6+ */
-        background: -webkit-gradient(linear, left top, right top, color-stop(0%,#a90329), color-stop(7%,#6d0019), color-stop(48%,#330000), color-stop(84%,#6d0019), color-stop(99%,#870002)); /* Chrome,Safari4+ */
-        background: -webkit-linear-gradient(left,  #a90329 0%,#6d0019 7%,#330000 48%,#6d0019 84%,#870002 99%); /* Chrome10+,Safari5.1+ */
-        background: -o-linear-gradient(left,  #a90329 0%,#6d0019 7%,#330000 48%,#6d0019 84%,#870002 99%); /* Opera 11.10+ */
-        background: -ms-linear-gradient(left,  #a90329 0%,#6d0019 7%,#330000 48%,#6d0019 84%,#870002 99%); /* IE10+ */
-        background: linear-gradient(to right,  #a90329 0%,#6d0019 7%,#330000 48%,#6d0019 84%,#870002 99%); /* W3C */
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a90329', endColorstr='#870002',GradientType=1 ); /* IE6-9 */
+        background: #2E4347;
       }
 
       div > .right-inner {
@@ -48,7 +40,6 @@
             <template if='{{!model.isFav}}'>
               <core-icon-button icon='favorite-outline' on-click='{{favorite}}' channel='{{model.channel}}' hidden></core-icon-button>
             </template>
-            <!-- <core-icon-button icon='{{favIcon}}' on-click='{{favorite}}' channel='{{model.channel}}'></core-icon-button> -->
             <core-icon-button icon='remove-circle-outline' on-click='{{remove}}' channel='{{model.channel}}'></core-icon-button>
           </div>
         </template>

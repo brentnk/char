@@ -15,10 +15,13 @@ html
     link(rel="import", href="bower_components/core-list/core-list.html")
     link(rel="import", href="bower_components/core-selector/core-selector.html")
     link(rel="import", href="bower_components/core-icon-button/core-icon-button.html")
+    link(rel="import", href="bower_components/paper-slider/paper-slider.html")
     link(rel="import", href="bower_components/polymer/polymer.html")
     link(rel='import', href='elements/char-socket.html')
     link(rel='import', href='elements/my-test.html')
     link(rel='import', href='elements/irc-channel-list.html')
+    link(rel='import', href='elements/twitch-channel-card.html')
+    link(rel='import', href='elements/text-highlight.html')
     link(rel='stylesheet', href='css/betaindex.css')
     script(src='bower_components/d3/d3.js')
   body(fullbleed='', layout='', vertical='', unresolved='')
@@ -27,9 +30,15 @@ html
         paper-icon-button#navicon(icon='arrow-back')
         div
           | Charbot
+          text-highlight
+            | brent is amazing
       core-drawer-panel(fit='')
         div.drawer(drawer)
           irc-channel-list
-        div.main(main,flex)
+        div.main(main,flex,layout,horizontal)
           my-test(fit)
+          //- twitch-channel-card
+          //- twitch-channel-card
+          //- twitch-channel-card
+          //- twitch-channel-card
     script(src='bower_components/underscore/underscore.js')

@@ -78,6 +78,7 @@ module.exports = function(io) {
     socket.on('irc:part', function(data) {
       if(!data || !('channel' in data)) {
         log.error('irc:part channel data missing.');
+        io.sockets.emit('irc:part', {channel:channel});
       } else {
         if(typeof(data.channel) === 'string') {
           if(getChannels().indexOf(data.channel) >= 0) {
@@ -130,22 +131,6 @@ module.exports = function(io) {
   //
   // IRC Client Routes
   //
-
-  // irc.addListener('raw', function(raw) {
-  //log.info({irc_message: raw});
-  //raw['@timestamp'] = Date.now();
-  // esClient.create({
-  //   index: 'irc',
-  //   type: 'ircmsg',
-  //   body: raw
-  // }, function(err,res) {
-  //   if(err) {
-  //     log.error(err);
-  //   } else {
-  //     log.info(res);
-  //   }
-  // });
-  // });
 
   irc.on('error', function() {
     console.log(e);

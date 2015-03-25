@@ -1,0 +1,27 @@
+<polymer-element name='text-highlight' attributes='q'>
+  <template>
+    <style>
+      div .lit {
+        color: red;
+      }
+    </style>
+    <div id='main'></div>
+  </template>
+  <script>
+   Polymer({
+     ready: function() {
+      //  console.log(this.textContent);
+       this.text = this.textContent;
+      //  this.highlight('is');
+     },
+     textContentChanged: function() {
+       this.text = this.textContent;
+     },
+     qChanged : function () {
+        this.injectBoundHTML(this.text.replace(new RegExp(this.q), function(a) {
+          return '<span class="lit">' + a + '</span>';
+        }), this.$.main);
+      }
+   });
+  </script>
+</polymer-element>

@@ -6,9 +6,34 @@
         background: #222;
         border: 3px;
       }
-    </style>
-    <div id='area' fit>
 
+      div  > paper-input {
+        color: azure;
+      }
+    </style>
+    <div id='area' fit layout flex vertical>
+      <div>
+        <paper-input on-keyup='{{filterChange}}' id='pretime' label='Pre time'></paper-input>
+        <paper-input on-keyup='{{filterChange}}' id='posttime' label='Post time'></paper-input>
+        <paper-input on-keyup='{{filterChange}}' id='query' label='query'></paper-input>
+        <paper-input value='{{highlight}}' id='highlight' label='Highlight'></paper-input>
+
+      </div>
+      <span>{{esData.length}}/{{esSize}} hit(s).</span>
+      <div>
+        <paper-slider min='10' max='20000' value='{{esSize}}'></paper-slider>
+      </div>
+      <div flex style='height: 100%;'>
+        <core-list data='{{esData}}' style='height: 100%;'>
+          <template>
+            <div>
+              <text-highlight q={{highlight}}>
+                {{model._source | stringify}}
+              </text-highlight>
+            </div>
+          </template>
+        </core-list>
+      </div>
     </div>
   </template>
   <script>
@@ -16,22 +41,49 @@
     ready: function() {
       var sel = d3.select(this.$.area);
       var cScale =  d3.scale.linear().domain([3,12,15]).range([1,1.25,1.5]);
+      this.esSize = 1000;
+      this.highlight = '';
+
+      this.filterChange = _.throttle(function(e) {
+        e.which = e.which || e.keyCode;
+        if(this.$.pretime.value && this.$.posttime.value) {
+          var data = {
+            index: 'irc',
+            type: 'ircmsg',
+            lowdate: Date.now() - this.$.pretime.value * 60 * 1000,
+            highdate: Date.now() - this.$.posttime.value * 60 * 1000,
+            size: this.esSize
+          };
+          if(this.$.query.value) {
+            data.query = this.$.query.value;
+          };
+
+          this.socket.emit('es:query', data);
+        }
+      }, 1500, {leading:false});
+
       console.log(cScale);
       console.log(sel);
       this.socket.on('es:query', this.handleES.bind(this));
       this.testEsQuery();
+
     },
     handleES: function(data) {
       this.esData = data.hits.hits;
-      this.esData.speakers = _.uniq(_.map(this.esData,function(a) {return a['_source'].from}));
+      console.log(this.esData);
+      // this.esData.speakers = _.uniq(_.map(this.esData,function(a) {return a['_source'].from}));
     },
     testEsQuery: function() {
       var data = {
         index: 'irc',
-        type: 'ircmsg'
+        type: 'ircmsg',
+        size: this.esSize
       };
 
       this.socket.emit('es:query', data);
+    },
+    stringify : function(v) {
+      return JSON.stringify(v);
     }
   });
   </script>
