@@ -3,12 +3,12 @@
     <char-socket id='socket' socket={{socket}}></char-socket>
     <style>
       #area {
-        background: #222;
+        background: azure;
         border: 3px;
       }
 
       div  > paper-input {
-        color: azure;
+        color: darkslategrey;
       }
     </style>
     <div id='area' fit layout flex vertical>
@@ -26,11 +26,30 @@
       <div flex style='height: 100%;'>
         <core-list data='{{esData}}' style='height: 100%;'>
           <template>
-            <div>
-              <text-highlight q={{highlight}}>
-                {{model._source | stringify}}
-              </text-highlight>
-            </div>
+            <style>
+              paper-shadow {
+                height: 60px;
+                margin: 8px;
+                padding: 5px;
+              }
+              .messageTo {
+
+              }
+            </style>
+            <paper-shadow>
+              <div layout flex vertical fit>
+                <div layout flex horizontal>
+                  <span class='messageTo'>{{model._source.to}}</span>
+                  <span flex></span>
+                  <span class='messageFrom'>{{model._source.from}}</span>
+                </div>
+                <div flex >
+                  <!-- <text-highlight q={{highlight}}> -->
+                    {{model._source.body | stringify}}
+                  <!-- </text-highlight> -->
+                </div>
+              </div>
+            </paper-shadow>
           </template>
         </core-list>
       </div>
@@ -62,16 +81,12 @@
         }
       }, 1500, {leading:false});
 
-      console.log(cScale);
-      console.log(sel);
       this.socket.on('es:query', this.handleES.bind(this));
       this.testEsQuery();
-
     },
     handleES: function(data) {
       this.esData = data.hits.hits;
       console.log(this.esData);
-      // this.esData.speakers = _.uniq(_.map(this.esData,function(a) {return a['_source'].from}));
     },
     testEsQuery: function() {
       var data = {

@@ -3,25 +3,33 @@
     <style>
       div .lit {
         color: red;
-      }
+        }
     </style>
     <div id='main'></div>
   </template>
   <script>
-   Polymer({
-     ready: function() {
-      //  console.log(this.textContent);
-       this.text = this.textContent;
-      //  this.highlight('is');
-     },
-     textContentChanged: function() {
-       this.text = this.textContent;
-     },
-     qChanged : function () {
-        this.injectBoundHTML(this.text.replace(new RegExp(this.q), function(a) {
-          return '<span class="lit">' + a + '</span>';
-        }), this.$.main);
+    Polymer({
+      created: function() {
+        this.q = '';
+      },
+      ready: function() {
+         console.log(this.textContent);
+        this.text = this.textContent;
+        this.injectBoundHTML(this.text, this.$.main);
+      },
+      textContentChanged: function() {
+        this.text = this.textContent;
+        },
+      qChanged : function () {
+        try {
+          var reg = new RegExp(this.q,'g');
+          this.injectBoundHTML(this.text.replace(reg, function(a) {
+            return '<span class="lit">' + a + '</span>';
+          }), this.$.main);
+        } catch(e) {
+          console.log('Indalid regex');
+        }
       }
-   });
+    });
   </script>
 </polymer-element>
