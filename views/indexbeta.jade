@@ -22,6 +22,7 @@ html
     link(rel='import', href='elements/irc-channel-list.html')
     link(rel='import', href='elements/twitch-channel-card.html')
     link(rel='import', href='elements/text-highlight.html')
+    link(rel='import', href='elements/d3-chart.html')
     link(rel='stylesheet', href='css/betaindex.css')
     script(src='bower_components/d3/d3.js')
   body(fullbleed='', layout='', vertical='', unresolved='')
@@ -36,7 +37,8 @@ html
         div.drawer(drawer)
           irc-channel-list
         div.main(main,flex,layout,horizontal)
-          my-test(fit)
+          d3-chart
+          //- my-test(fit)
           //- twitch-channel-card
           //- twitch-channel-card
           //- twitch-channel-card

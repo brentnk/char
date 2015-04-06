@@ -46,13 +46,6 @@ module.exports = function(io) {
     }
   });
 
-  if (config.heapdump) {
-
-    setInterval(function() {
-      heapdump.writeSnapshot();
-    }, 3000);
-  }
-
   //
   // Socket IO routes
   //
@@ -123,9 +116,6 @@ module.exports = function(io) {
         console.trace(err.message);
       });
     })
-
-
-
   });
 
   //

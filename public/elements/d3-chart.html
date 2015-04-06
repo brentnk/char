@@ -1,0 +1,28 @@
+<polymer-element name='d3-chart'>
+  <template>
+    <style>
+      div#main {
+        background: beige;
+      }
+    </style>
+    <div id='main'>
+
+    </div>
+  </template>
+  <script>
+    Polymer({
+      ready: function() {
+        console.log('d3-chart is ready')
+        svg = d3.select(this.$.main).append('svg')
+          .attr('width', 500)
+          .attr('height', 250)
+
+        svg.append('circle')
+            .attr('cx', 250)
+            .attr('cy', 125)
+            .attr('r', 15)
+            .style('fill','#800080')
+      }
+    });
+  </script>
+</polymer-element>
